@@ -61,17 +61,18 @@ All data in `data/` folder as JSON. Two row types.
 
 ### 2. Taken from mlbbhub
 
-1448 counter rows. Script downloads them.
+1448 counter rows. Script downloads them. `COUNTERED_BY` rows are victim-first
+(source loses, target wins) to match hand-written rows.
 
 ```json
 {
-  "source": "kaja",
-  "target": "zhask",
+  "source": "zhask",
+  "target": "kaja",
   "type": "COUNTERED_BY",
   "score": 6,
   "tags": ["measured"],
-  "reason": "Zhask kuat lawan kaja (mlbbhub strong-against). Hindari pick kaja.",
-  "sources": ["https://mlbbhub.com/counter/zhask"]
+  "reason": "Zhask lemah lawan kaja (mlbbhub strong-against). Hindari pick zhask.",
+  "sources": ["https://mlbbhub.com/counter/kaja"]
 }
 ```
 
@@ -163,6 +164,20 @@ pnpm icons:cache <slug>      # download hero icons
 ```
 
 Just tools run now and then. App itself never downloads anything.
+
+### What `data:update` does
+
+1. Fetches `mlbbhub.com/api/stats` → refreshes `meta.json` (win_rate, pick_rate, ban_rate, tier)
+2. New heroes → scrapes hero page for name/role/lane/icon, appends to `heroes.json` with `NoData` tag
+3. Caches new icons locally via `cache-icons.mjs`
+
+### What `counters:update` does
+
+1. For each hero, scrapes `/counter/<slug>`
+2. "Proven Counters" with +pp → `COUNTER` rows (score = `min(10, round(5 + pp))`)
+3. "Strong Against" → `COUNTERED_BY` rows (victim-first, score 6)
+4. Skips conflicts with hand-written rows (preserves M1 seed data)
+5. Validates all rows before writing
 
 ## What is not done yet
 
