@@ -22,9 +22,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # The Cloudflare Pages project name. This is NOT auto-detected: it must match
-  # the project you created in Cloudflare. Override it without editing this file
-  # by adding a repository variable named PAGES_PROJECT
+  # The Cloudflare Pages project name. This is NOT auto-detected: it must
+  # match the project you created in Cloudflare. Override it without editing
+  # this file by adding a repository variable named PAGES_PROJECT
   # (Settings -> Secrets and variables -> Actions -> Variables).
   PAGES_PROJECT: ${{ vars.PAGES_PROJECT || 'mlbb-draft-coach' }}
 
@@ -53,21 +53,29 @@ jobs:
   preview:
     name: Preview deploy
     needs: verify
-    # The Cloudflare credentials live in an environment, not at repository level,
-    # so the job has to name that environment. Without this the secrets resolve
-    # to an empty string and wrangler reports a missing CLOUDFLARE_API_TOKEN.
+    # The Cloudflare credentials live in an environment, not at repository
+    # level, so the job has to name that environment. Without this the
+    # secrets resolve to an empty string and wrangler reports a missing
+    # CLOUDFLARE_API_TOKEN.
     environment: cf
     # Forks do not get repository secrets, so only deploy same-repo branches.
     if: >-
       (github.event_name == 'pull_request' &&
        github.event.pull_request.head.repo.full_name == github.repository) ||
-      (github.event_name == 'workflow_dispatch' && inputs.target == 'preview')
+      (github.event_name == 'workflow_dispatch' &&
+       inputs.target == 'preview')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       # Both values are integers, never free-form text, so nothing here can
       # inject a shell command. A PR branch name could not be trusted this way.
-      PAGES_BRANCH: pr-${{ github.event.pull_request.number || github.run_number }}
+      PAGES_BRANCH: >-
+        pr-${{ github.event.pull_request.number || github.run_number }}
+      # Read the Google Search Console site-verification token from the cf
+      # environment's variables (Settings -> Environments -> cf). The Vite
+      # plugin in vite.config.ts reads process.env.GOOGLE_SITE_VERIFICATION
+      # at build time and injects the meta tag into index.html.
+      GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -92,11 +100,15 @@ jobs:
         run: |
           missing=0
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "::error::CLOUDFLARE_API_TOKEN is empty or unset. Add it under Settings -> Secrets and variables -> Actions -> Secrets."
+            echo "::error::CLOUDFLARE_API_TOKEN is empty or unset.
+              Add it under Settings -> Secrets and variables -> Actions
+              -> Secrets."
             missing=1
           fi
           if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or unset. Add it under Settings -> Secrets and variables -> Actions -> Secrets."
+            echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or unset.
+              Add it under Settings -> Secrets and variables -> Actions
+              -> Secrets."
             missing=1
           fi
           if [ "$missing" -eq 1 ]; then
@@ -110,7 +122,9 @@ jobs:
           if [ "$status" != "200" ]; then
             echo "::error::Cloudflare rejected the request (HTTP $status)."
             grep -o '"message":"[^"]*"' "$body" || cat "$body"
-            echo "The token needs Account -> Cloudflare Pages -> Edit. The built-in 'Edit Cloudflare Workers' template does not grant it."
+            echo "The token needs Account -> Cloudflare Pages -> Edit.
+              The built-in 'Edit Cloudflare Workers' template does not
+              grant it."
             exit 1
           fi
           echo "Token is valid and the Pages project \"$PAGES_PROJECT\" exists."
@@ -129,19 +143,25 @@ jobs:
         run: |
           {
             echo "### Preview deployment"
-            grep -oE 'https://[A-Za-z0-9.-]+\.pages\.dev' deploy-output.txt | sort -u || true
+            grep -oE 'https://[A-Za-z0-9.-]+\.pages\.dev' \
+              deploy-output.txt | sort -u || true
           } >> "$GITHUB_STEP_SUMMARY"
 
   production:
     name: Production deploy
     needs: verify
-    # Must match the environment that holds the Cloudflare secrets; see preview.
+    # Must match the environment that holds the Cloudflare secrets; see
+    # preview.
     environment: cf
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'workflow_dispatch' && inputs.target == 'production')
+      (github.event_name == 'workflow_dispatch' &&
+       inputs.target == 'production')
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # Same source as the preview job: environment variables on `cf`.
+      GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -166,11 +186,14 @@ jobs:
         run: |
           missing=0
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "::error::CLOUDFLARE_API_TOKEN is empty or unset. Add it under Settings -> Secrets and variables -> Actions -> Secrets."
+            echo "::error::CLOUDFLARE_API_TOKEN is empty or unset.
+              Add it under Settings -> Secrets and variables -> Actions
+              -> Secrets."
             missing=1
           fi
           if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or unset. Add it under Settings -> Secrets and variables -> Actions -> Secrets."
+            echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or unset.
+              Add it under Secrets and variables -> Actions -> Secrets."
             missing=1
           fi
           if [ "$missing" -eq 1 ]; then
@@ -184,7 +207,9 @@ jobs:
           if [ "$status" != "200" ]; then
             echo "::error::Cloudflare rejected the request (HTTP $status)."
             grep -o '"message":"[^"]*"' "$body" || cat "$body"
-            echo "The token needs Account -> Cloudflare Pages -> Edit. The built-in 'Edit Cloudflare Workers' template does not grant it."
+            echo "The token needs Account -> Cloudflare Pages -> Edit.
+              The built-in 'Edit Cloudflare Workers' template does not
+              grant it."
             exit 1
           fi
           echo "Token is valid and the Pages project \"$PAGES_PROJECT\" exists."
@@ -205,5 +230,6 @@ jobs:
         run: |
           {
             echo "### Production deployment"
-            grep -oE 'https://[A-Za-z0-9.-]+\.pages\.dev' deploy-output.txt | sort -u || true
+            grep -oE 'https://[A-Za-z0-9.-]+\.pages\.dev' \
+              deploy-output.txt | sort -u || true
           } >> "$GITHUB_STEP_SUMMARY"
