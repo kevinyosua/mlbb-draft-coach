@@ -185,7 +185,10 @@ export default function App() {
   return (
     <div className="mdc-app">
       <header className="mdc-topbar">
-        <h1 className="mdc-goldnum mdc-brand">{t.title}</h1>
+        <h1 className="mdc-goldnum mdc-brand">
+          {t.title}
+          <span className="mdc-sr"> — {t.tagline}</span>
+        </h1>
         <div className="mdc-row-c">
           <span className="mdc-muted">
             {t.patch} {data.heroes[0]?.patch}

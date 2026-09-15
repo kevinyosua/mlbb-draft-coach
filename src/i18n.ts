@@ -2,6 +2,7 @@ export type Lang = 'id' | 'en';
 export const STR: Record<Lang, Record<string, string>> = {
   id: {
     title: 'MLBB Draft Coach',
+    tagline: 'Rekomendasi Pick dan Ban Mobile Legends',
     allies: 'Tim Kawan',
     enemies: 'Tim Lawan',
     bans: 'Ban',
@@ -46,6 +47,7 @@ export const STR: Record<Lang, Record<string, string>> = {
   },
   en: {
     title: 'MLBB Draft Coach',
+    tagline: 'Mobile Legends Pick and Ban Recommendations',
     allies: 'Our Team',
     enemies: 'Enemy Team',
     bans: 'Bans',
