@@ -45,6 +45,11 @@
       "jsxQuoteStyle": "double"
     }
   },
+  "html": {
+    "formatter": {
+      "enabled": true
+    }
+  },
   "assist": {
     "enabled": false
   },
