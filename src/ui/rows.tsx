@@ -135,7 +135,7 @@ interface HeroRowsProps {
   heroes: Hero[];
   meta: MetaRow[];
   lang: Lang;
-  labels: { addAlly: string; addEnemy: string; addOurBan: string; addEnemyBan: string };
+  labels: { pickGroup: string; banGroup: string; teamUs: string; teamThem: string };
   onToggle: (id: string) => void;
   onAdd: (side: Side, id: string) => void;
 }
@@ -167,12 +167,23 @@ function HeroRow(p: HeroRowProps) {
     wasExpanded.current = p.expanded;
   }, [p.expanded]);
   const { h, i, where, rec, mt, m } = p;
-  const act = (s: Side, label: string) => (
-    <button type="button" key={s} onClick={() => p.onAdd(s, h.id)} disabled={where === s || (!where && p.full(s))} className="mdc-act">
-      {label}
-      {where === s ? ' ✓' : ''}
-    </button>
-  );
+  const act = (s: Side, label: string, fullLabel: string) => {
+    const banned = s === 'ourBan' || s === 'enemyBan';
+    return (
+      <button
+        type="button"
+        key={s}
+        onClick={() => p.onAdd(s, h.id)}
+        disabled={where === s || (!where && p.full(s))}
+        aria-label={fullLabel}
+        className={`mdc-act${banned ? ' mdc-ban-act' : ''}`}
+      >
+        {banned ? <span aria-hidden="true">✕&nbsp;</span> : null}
+        {label}
+        {where === s ? ' ✓' : ''}
+      </button>
+    );
+  };
   // ponytail: bar width dynamic per score — keep CSS var, switch to attr() when supported.
   const bar = { '--bar': `${Math.round(rec?.score ?? 0)}%` } as CSSProperties;
   return (
@@ -261,10 +272,20 @@ function HeroRow(p: HeroRowProps) {
             </>
           )}
           <div className="mdc-actions" ref={actionsRef}>
-            {act('ally', p.labels.addAlly)}
-            {act('enemy', p.labels.addEnemy)}
-            {act('ourBan', p.labels.addOurBan)}
-            {act('enemyBan', p.labels.addEnemyBan)}
+            <div className="mdc-actgroup">
+              <span className="mdc-acthead">{p.labels.pickGroup}</span>
+              <div className="mdc-actpair">
+                {act('ally', p.labels.teamUs, `Pick ${p.labels.teamUs}`)}
+                {act('enemy', p.labels.teamThem, `Pick ${p.labels.teamThem}`)}
+              </div>
+            </div>
+            <div className="mdc-actgroup mdc-actgroup-ban">
+              <span className="mdc-acthead mdc-acthead-ban">{p.labels.banGroup}</span>
+              <div className="mdc-actpair">
+                {act('ourBan', p.labels.teamUs, `Ban ${p.labels.teamUs}`)}
+                {act('enemyBan', p.labels.teamThem, `Ban ${p.labels.teamThem}`)}
+              </div>
+            </div>
           </div>
         </>
       )}

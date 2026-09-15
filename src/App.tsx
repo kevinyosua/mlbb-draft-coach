@@ -324,7 +324,7 @@ export default function App() {
         heroes={data.heroes}
         meta={data.meta}
         lang={lang}
-        labels={{ addAlly: t.addAlly, addEnemy: t.addEnemy, addOurBan: t.addOurBan, addEnemyBan: t.addEnemyBan }}
+        labels={{ pickGroup: t.pickGroup, banGroup: t.banGroup, teamUs: t.teamUs, teamThem: t.teamThem }}
         onToggle={(id) => setOpenHero(openHero === id ? null : id)}
         onAdd={(s, id) => {
           addSide(s, id);

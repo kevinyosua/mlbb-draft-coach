@@ -440,13 +440,56 @@ select {
   padding-left: 18px;
 }
 .mdc-act {
-  flex: 1 1 100px;
+  min-width: 0;
+  padding: 6px 4px;
+  font-size: 13px;
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .mdc-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
-  flex-wrap: wrap;
   margin-top: 6px;
+}
+.mdc-actgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.mdc-acthead {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  text-align: center;
+}
+.mdc-acthead-ban {
+  color: var(--red);
+}
+.mdc-actpair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 360px) {
+  .mdc-actions {
+    grid-template-columns: 1fr;
+  }
+}
+.mdc-act.mdc-ban-act {
+  background: var(--red-dim);
+  border-color: rgba(248, 113, 113, 0.35);
+  color: #fca5a5;
+}
+.mdc-act.mdc-ban-act:hover {
+  background: rgba(248, 113, 113, 0.22);
+  border-color: rgba(248, 113, 113, 0.55);
 }
 .mdc-filterbar {
   position: sticky;
