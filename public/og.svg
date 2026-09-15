@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#101a3a"/>
+      <stop offset="0.6" stop-color="#070b18"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g transform="translate(120,159)">
+    <rect x="0" y="0" width="312" height="312" rx="72" fill="#16203c" stroke="#fbbf24" stroke-width="16"/>
+    <path d="M96 220 V92 L156 156 L216 92 V220" fill="none" stroke="#fbbf24" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="480" y="290" font-family="system-ui, sans-serif" font-size="72" font-weight="800" fill="#fbbf24">MLBB Draft Coach</text>
+  <text x="480" y="360" font-family="system-ui, sans-serif" font-size="36" fill="#b3bdd2">Rekomendasi pick &amp; ban berdasar counter, meta &amp; sinergi</text>
+</svg>
