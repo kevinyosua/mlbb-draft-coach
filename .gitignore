@@ -29,3 +29,10 @@ dist-ssr
 
 # vitest cache
 .vitest
+
+# AI agent files
+.agents/
+.agent/
+.claude/
+.cursor/
+skills-lock.json
